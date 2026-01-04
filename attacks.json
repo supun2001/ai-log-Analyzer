@@ -1,0 +1,118 @@
+[
+    {
+        "timestamp": "2026-01-01T19:55:30.200+0000",
+        "rule": {
+            "level": 9,
+            "description": "Root login detected",
+            "id": "5402",
+            "mitre": {
+                "id": [
+                    "T1078"
+                ],
+                "tactic": [
+                    "Persistence"
+                ],
+                "technique": [
+                    "Valid Accounts"
+                ]
+            }
+        },
+        "agent": {
+            "id": "001",
+            "name": "ubuntu-server",
+            "ip": "192.168.1.20"
+        },
+        "data": {
+            "srcip": "192.168.1.99",
+            "user": "root"
+        }
+    },
+    {
+        "timestamp": "2026-01-01T19:50:02.891+0000",
+        "rule": {
+            "level": 8,
+            "description": "File modified",
+            "id": "550",
+            "mitre": {
+                "id": [
+                    "T1565"
+                ],
+                "tactic": [
+                    "Defense Evasion"
+                ],
+                "technique": [
+                    "Data Manipulation"
+                ]
+            }
+        },
+        "agent": {
+            "id": "003",
+            "name": "db-server",
+            "ip": "192.168.1.40"
+        },
+        "data": {
+            "file": "/etc/passwd",
+            "md5_old": "abc123",
+            "md5_new": "def456"
+        }
+    },
+    {
+        "timestamp": "2026-01-01T19:45:55.512+0000",
+        "rule": {
+            "level": 12,
+            "description": "SQL injection attempt detected",
+            "id": "31103",
+            "mitre": {
+                "id": [
+                    "T1190"
+                ],
+                "tactic": [
+                    "Initial Access"
+                ],
+                "technique": [
+                    "Exploit Public-Facing Application"
+                ]
+            }
+        },
+        "agent": {
+            "id": "002",
+            "name": "web-server",
+            "ip": "192.168.1.30"
+        },
+        "data": {
+            "url": "/login.php?user=admin'--",
+            "srcip": "103.21.244.0",
+            "http_method": "GET"
+        },
+        "location": "/var/log/apache2/access.log"
+    },
+    {
+        "timestamp": "2026-01-01T19:42:11.123+0000",
+        "rule": {
+            "level": 10,
+            "description": "Multiple failed SSH login attempts",
+            "id": "5712",
+            "mitre": {
+                "id": [
+                    "T1110"
+                ],
+                "tactic": [
+                    "Credential Access"
+                ],
+                "technique": [
+                    "Brute Force"
+                ]
+            }
+        },
+        "agent": {
+            "id": "001",
+            "name": "ubuntu-server",
+            "ip": "192.168.1.20"
+        },
+        "data": {
+            "srcip": "45.83.123.10",
+            "dstuser": "root"
+        },
+        "location": "/var/log/auth.log"
+    }
+]

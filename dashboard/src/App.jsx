@@ -1,0 +1,273 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Shield,
+  LayoutDashboard,
+  Search,
+  Terminal,
+  Activity,
+  Bell,
+  Cpu,
+  Box,
+  ChevronRight,
+  Menu,
+  Zap,
+  Info,
+  AlertTriangle,
+  Lock
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Mock data based on the project's attacks.json
+const MOCK_ALERTS = [
+  {
+    "timestamp": "2026-01-01T19:55:30.200Z",
+    "description": "Root login detected",
+    "level": 9,
+    "agent": "ubuntu-server",
+    "srcip": "192.168.1.99",
+    "analysis": "A login to the 'root' account was detected from 192.168.1.99. This is a high-security risk as root access should be restricted. Immediate investigation is required to confirm if this was an authorized administrative action."
+  },
+  {
+    "timestamp": "2026-01-01T19:50:02.891Z",
+    "description": "File modified: /etc/passwd",
+    "level": 8,
+    "agent": "db-server",
+    "srcip": "Local",
+    "analysis": "The system password file /etc/passwd has been modified. This type of change can indicate the creation of new users or modification of existing ones, often a sign of persistence attempts by attackers."
+  },
+  {
+    "timestamp": "2026-01-01T19:45:55.512Z",
+    "description": "SQL injection attempt detected",
+    "level": 12,
+    "agent": "web-server",
+    "srcip": "103.21.244.0",
+    "analysis": "A malicious SQL query was identified in a GET request to /login.php. The pattern 'admin'--' is a classic bypass technique. The web firewall blocked this specific instance, but the source IP should be blacklisted."
+  },
+  {
+    "timestamp": "2026-01-01T19:42:11.123Z",
+    "description": "Multiple failed SSH login attempts",
+    "level": 10,
+    "agent": "ubuntu-server",
+    "srcip": "45.83.123.10",
+    "analysis": "Brute-force attack detected from 45.83.123.10. Over 50 unsuccessful SSH attempts recorded within 60 seconds targeting the root account. The IP has been automatically banned by Fail2Ban."
+  }
+];
+
+const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${active
+        ? 'bg-blue-600/20 text-blue-400 border-l-4 border-blue-500 rounded-l-none'
+        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+      }`}
+  >
+    <Icon size={20} />
+    <span className="font-medium text-sm">{label}</span>
+  </button>
+);
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('analyzer');
+  const [selectedAlert, setSelectedAlert] = useState(MOCK_ALERTS[0]);
+
+  return (
+    <div className="flex min-h-screen bg-[#0b0f19] text-white">
+      {/* Sidebar */}
+      <aside className="w-64 bg-[#111827] border-r border-white/5 flex flex-col pt-6">
+        <div className="px-6 mb-8 flex items-center gap-2">
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <Shield size={24} className="text-white" />
+          </div>
+          <span className="text-xl font-bold tracking-tight outfit">WAZUH <span className="text-blue-500 text-xs align-top">AI</span></span>
+        </div>
+
+        <nav className="flex-1 px-3 space-y-1">
+          <SidebarItem icon={LayoutDashboard} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <SidebarItem icon={Box} label="Agents" active={activeTab === 'agents'} onClick={() => setActiveTab('agents')} />
+          <SidebarItem icon={Bell} label="Security Events" active={activeTab === 'events'} onClick={() => setActiveTab('events')} />
+          <SidebarItem icon={Lock} label="Compliance" active={activeTab === 'compliance'} onClick={() => setActiveTab('compliance')} />
+
+          <div className="pt-4 pb-2 px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            AI Extensions
+          </div>
+          <SidebarItem icon={Zap} label="AI Analyzer" active={activeTab === 'analyzer'} onClick={() => setActiveTab('analyzer')} />
+        </nav>
+
+        <div className="p-4 mt-auto border-t border-white/5">
+          <div className="bg-gray-800/50 p-3 rounded-xl flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500" />
+            <div>
+              <p className="text-xs font-semibold">Admin User</p>
+              <p className="text-[10px] text-gray-400">Security Analyst</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#111827]/50 backdrop-blur-md sticky top-0 z-10">
+          <div className="flex items-center gap-4">
+            <h2 className="text-lg font-semibold tracking-tight outfit uppercase text-gray-400">
+              {activeTab.replace('-', ' ')}
+            </h2>
+            <div className="h-4 w-[1px] bg-white/10" />
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Endpoint Connected
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+              <input
+                type="text"
+                placeholder="Search alerts..."
+                className="bg-gray-800/50 border border-white/5 rounded-full py-1.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 w-64 transition-all"
+              />
+            </div>
+            <button className="bg-white/5 p-2 rounded-full hover:bg-white/10 transition-colors relative">
+              <Bell size={18} />
+              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-[#111827]" />
+            </button>
+          </div>
+        </header>
+
+        {/* Dynamic Content */}
+        <div className="flex-1 overflow-y-auto p-8">
+          <AnimatePresence mode="wait">
+            {activeTab === 'analyzer' && (
+              <motion.div
+                key="analyzer"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-6"
+              >
+                <div className="flex justify-between items-end">
+                  <div>
+                    <h1 className="text-3xl font-bold outfit mb-1">Security <span className="text-blue-500">Analyzer</span></h1>
+                    <p className="text-gray-400 text-sm">Automated AI synthesis of security events and log patterns.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                      <Zap size={16} /> Run Full Scan
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-12 gap-6">
+                  {/* Alerts List */}
+                  <div className="col-span-4 space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Recent Alarms</h3>
+                      <Activity size={14} className="text-blue-500" />
+                    </div>
+                    {MOCK_ALERTS.map((alert, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedAlert(alert)}
+                        className={`w-full text-left p-4 rounded-xl border transition-all ${selectedAlert === alert
+                            ? 'bg-blue-600/10 border-blue-500/50 shadow-lg shadow-blue-500/5'
+                            : 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.07]'
+                          }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${alert.level >= 10 ? 'bg-red-500/20 text-red-500' : 'bg-orange-500/20 text-orange-400'
+                            }`}>
+                            Level {alert.level}
+                          </span>
+                          <span className="text-[10px] text-gray-500">{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <h4 className="font-semibold text-sm mb-1 truncate">{alert.description}</h4>
+                        <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                          <Cpu size={10} /> {alert.agent}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* AI Output Pane */}
+                  <div className="col-span-8">
+                    <div className="glass h-full rounded-2xl overflow-hidden flex flex-col min-h-[500px]">
+                      <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-blue-600/20 p-2 rounded-lg text-blue-400">
+                            <Terminal size={20} />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-lg">AI Analysis Report</h3>
+                            <p className="text-xs text-gray-500">Powered by Llama 3.2 via Ollama</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Integrity</p>
+                            <p className="text-xs text-emerald-400 font-bold">100% Verifiable</p>
+                          </div>
+                          <div className="h-8 w-[1px] bg-white/10" />
+                          <Info size={18} className="text-gray-500" />
+                        </div>
+                      </div>
+
+                      <div className="p-8 flex-1">
+                        <motion.div
+                          key={selectedAlert.description}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="space-y-8"
+                        >
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                              <p className="text-[10px] font-bold text-gray-500 uppercase mb-1">Source Impact</p>
+                              <p className="text-sm font-semibold">{selectedAlert.srcip}</p>
+                            </div>
+                            <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                              <p className="text-[10px] font-bold text-gray-500 uppercase mb-1">Target Agent</p>
+                              <p className="text-sm font-semibold uppercase">{selectedAlert.agent}</p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-blue-400">
+                              <Activity size={18} />
+                              <h4 className="font-bold tracking-tight">Technical Breakdown</h4>
+                            </div>
+                            <p className="text-gray-300 leading-relaxed text-sm">
+                              {selectedAlert.analysis}
+                            </p>
+                          </div>
+
+                          <div className="bg-blue-600/5 border border-blue-500/20 p-4 rounded-xl">
+                            <div className="flex items-center gap-2 text-blue-400 mb-2 font-bold text-sm">
+                              <Zap size={16} /> Recommended Action
+                            </div>
+                            <ul className="text-xs text-gray-400 space-y-2 list-disc pl-4">
+                              <li>Block source IP {selectedAlert.srcip} across all perimeter firewalls.</li>
+                              <li>Audit active sessions on {selectedAlert.agent} for anomalies.</li>
+                              <li>Initiate standard incident response protocol (IR-024).</li>
+                            </ul>
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      <div className="p-4 bg-black/20 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500">
+                        <span>Analysis generated in 1.2s</span>
+                        <div className="flex gap-4">
+                          <button className="hover:text-blue-400 transition-colors">EXPORT PDF</button>
+                          <button className="hover:text-blue-400 transition-colors">SHARE TO SLACK</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
+    </div>
+  );
+}
