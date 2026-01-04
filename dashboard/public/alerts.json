@@ -1,0 +1,34 @@
+[
+    {
+        "timestamp": "2026-01-01T19:55:30.200+0000",
+        "description": "Root login detected",
+        "level": 9,
+        "agent": "ubuntu-server",
+        "srcip": "192.168.1.99",
+        "analysis": "This security alert means that someone has tried to log into your computer or network using the \"root\" username and password, which is usually reserved for administrative access.\n\nIn simple terms:\n\n* The attacker's IP address (a unique number assigned to their device) was 192.168.1.99.\n* They used the \"root\" account, which is typically only allowed for people with high-level access to the system.\n\nThis alert suggests that someone has attempted to gain unauthorized access to your computer or network using this method, and it's recommended to investigate further to ensure the security of your system."
+    },
+    {
+        "timestamp": "2026-01-01T19:50:02.891+0000",
+        "description": "File modified",
+        "level": 8,
+        "agent": "db-server",
+        "srcip": "Local",
+        "analysis": "This is a security alert:\n\n* A file has been changed or updated.\n* The specific file that was changed is called `/etc/passwd`.\n* When the file was last modified, its digital fingerprint (called an MD5 hash) was `abc123`.\n* Now, the same file's digital fingerprint is `def456`.\n\nIn simple terms, someone or something has made changes to the `/etc/passwd` file. This could be a suspicious activity, as this file contains sensitive information about who has access to certain resources on a computer system.\n\nIt's like finding out that someone has altered a critical document, like a password list, without your knowledge or permission."
+    },
+    {
+        "timestamp": "2026-01-01T19:45:55.512+0000",
+        "description": "SQL injection attempt detected",
+        "level": 12,
+        "agent": "web-server",
+        "srcip": "103.21.244.0",
+        "analysis": "Here's a simplified explanation of the security alert:\n\n**What happened:** Someone tried to hack into your website by injecting bad code into your login page.\n\n**How it worked:**\n\n1. The hacker sent a request to your website with a URL that looked like this: `/login.php?user=admin'--`.\n2. This URL included extra characters (`'--`) at the end, which are not part of normal user input.\n3. Your website's database tried to execute this code as if it was valid user input.\n\n**Why is it bad:** Injecting bad code like this can allow hackers to access sensitive data or take control of your website.\n\n**What does it mean for you:** This security alert indicates that your website has a vulnerability that needs to be fixed. You should investigate and patch this issue to prevent further attacks.\n\nThink of it like trying to log in to a secure building with an invalid keycard. The bad code is the invalid input, and your system's database tried to execute it as if it was legitimate."
+    },
+    {
+        "timestamp": "2026-01-01T19:42:11.123+0000",
+        "description": "Multiple failed SSH login attempts",
+        "level": 10,
+        "agent": "ubuntu-server",
+        "srcip": "45.83.123.10",
+        "analysis": "Here's a simplified explanation of the security alert:\n\nThere was an attempt to log in to your computer (or server) using SSH (a secure way to access remote computers), but the login was unsuccessful multiple times.\n\nThe details say that the IP address making these attempts is 45.83.123.10 and they tried to log in with a user account called \"root\"."
+    }
+]
